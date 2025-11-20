@@ -1,0 +1,137 @@
+<script>
+    let showSubMenu = (x) => x.nextElementSibling.classList.toggle('hidden');
+    let showChildSubMenu = (x) => x.classList.toggle('hidden');
+    let toggleMobileMenu = () => document.getElementById("menuMobile").classList.toggle('hidden');
+</script>
+
+<header class="bg-darkColor justify-items-center text-lightColor">
+    <div class='flex justify-between items-center w-10/12 min-h-24'>
+
+        {% comment %} Hamburger Menu {% endcomment %}
+         <div class='w-1/6 md:w-1/12 lg:hidden' ontouchstart="toggleMobileMenu()">
+            {% render 'icon-hamburger' %}
+            <div class="text-xs text-center mt-1 text-primaryDark">
+                {{ section.settings.header_text }}
+            </div>
+        </div>
+
+        {% comment %} Brand Logo {% endcomment %}
+        <div class='w-4/6 md:w-10/12 lg:w-3/12 justify-items-center md:justify-items-start'>
+            <img src="{{ 'audiophile-logo.png' | asset_img_url: 'large' }}" alt="{{shop.name}}" width="140" height="24">
+        </div>
+
+        {% comment %} Desktop Menu Links {% endcomment %}
+        <div class='hidden lg:block lg:w-6/12'>
+            <nav class='flex justify-around w-50vh'>
+                {% for link in linklists.menu.links %}
+                    {% if link.links != blank %}
+
+                        <div class="absolute">
+                            <button type="button" onmouseover="showSubMenu(this)" onmouseout="showSubMenu(this)" class="inline-flex items-center text-base uppercase hover:text-primaryDark {% if link.child_active %}text-primaryDark{% endif %}">
+                                {{ link.title }}
+                                {% render 'icon-dropdown' %}
+                            </button>
+                            <div class="hidden" onmouseover="showChildSubMenu(this)" onmouseout="showChildSubMenu(this)">
+                                {%- for child_link in link.links -%}
+                                    <div class="relative bg-darkColor px-4 py-3">
+                                        <a href="{{ child_link.url }}" class="text-base uppercase hover:text-primaryDark {% if child_link.active %}text-primaryDark{% endif %}">{{ child_link.title }}</a>
+                                    </div>
+                                {%- endfor -%}
+                            </div>
+                        </div>
+
+                    {% else %}
+                        <div class="relative">
+                            <a href="{{ link.url }}" class="text-base uppercase hover:text-primaryDark {% if link.active %}text-primaryDark{% endif %}">{{ link.title }}</a>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </nav>
+        </div>
+
+        {% comment %} MOBILE MENU CONTAINER {% endcomment %}
+        <div id="menuMobile" class="absolute z-10 top-0 inset-x-0 p-2 transform origin-top-left hidden lg:hidden">
+            <div class="shadow-lg ring-1 ring-black ring-opacity-5 bg-darkColor w-full">
+                <div class="p-10 md:px-30 divide-y-2 divide-primaryDark">
+
+                    <!-- MOBILE MENU HEADER TITLE PLUS CLOSE BUTTON -->
+                    <div class="flex items-center justify-between pb-3">
+                        <div>
+                            <img src="{{ 'audiophile-logo.png' | asset_img_url: 'large' }}" alt="{{shop.name}}" width="140" height="24">
+                        </div>
+                        <div class="-mr-2">
+                            <button type="button" class="p-2 text-lightColor hover:text-primaryDark hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primaryDark" ontouchstart="toggleMobileMenu()">
+                                {% render 'icon-x' %}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- NAVIGATION LINKS FOR MOBILE MENU -->
+                    <div class="pt-3">
+                        <nav class="grid gap-y-7">
+
+                            {% for link in linklists.menu.links %}
+                                {% if link.links != blank %}
+
+                                    <div class="justify-items-center">
+                                        <button type="button" ontouchstart="showSubMenu(this)" class="inline-flex items-center text-base uppercase hover:text-primaryDark {% if link.child_active %}text-primaryDark{% endif %}">
+                                            {{ link.title }}
+                                            {% render 'icon-dropdown' %}
+                                        </button>
+                                        <div class="hidden">
+                                            {%- for child_link in link.links -%}
+                                                <div class="relative bg-darkColor px-4 py-3">
+                                                    <a href="{{ child_link.url }}" ontouchstart="toggleMobileMenu()" class="text-base uppercase hover:text-primaryDark {% if child_link.active %}text-primaryDark{% endif %}">{{ child_link.title }}</a>
+                                                </div>
+                                            {%- endfor -%}
+                                        </div>
+                                    </div>
+
+                                {% else %}
+                                    <div class="">
+                                        <a href="{{ link.url }}" class="text-base uppercase hover:text-primaryDark {% if link.active %}text-primaryDark{% endif %}">{{ link.title }}</a>
+                                    </div>
+                                {% endif %}
+
+                            {% endfor %}
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% comment %} Cart Icon {% endcomment %}
+        <div class='flex justify-end gap-x-4 w-1/6 md:w-1/12 lg:w-3/12 text-primaryDark'>
+            <a href="{{ routes.cart_url }}" class="text-base text-lightColor hover:text-primaryDark md:flex">
+                {% render 'icon-shopping-cart' %}
+            </a>
+            {% if shop.customer_accounts_enabled %}
+                <a href="{{ routes.account_login_url }}" class=" text-base text-lightColor hover:text-primaryDark hidden md:flex">Login</a>
+                <a href="{{ routes.account_register_url }}" class="text-base text-lightColor hover:text-primaryDark hidden md:flex">Register</a>
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+{% schema  %}
+    {
+        "name": "Header",
+        "tag": "header",
+        "class": "testClass",
+        "settings": [
+            {
+                "type": "text",
+                "id": "header_text",
+                "label": "Header Text",
+                "default": "Test"
+            },
+            {
+                "type": "text",
+                "id": "header_text2",
+                "label": "Header Text",
+                "default": "Test_2"
+            },
+        ],
+    }
+{% endschema %}
